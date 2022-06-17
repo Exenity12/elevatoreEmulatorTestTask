@@ -1,7 +1,7 @@
 <template>
-  <div class="mainBoard">
-    <div>
-      <Elevator />
+  <div>
+    <div class="mainBoard">
+      <Elevator v-bind:numberFloor="elevatorPosition"/>
       <Floor 
         v-for="item in floor" :key="floor.number"
         v-bind:floorNumber="item.number"
@@ -43,7 +43,7 @@ export default {
       if(this.matchingFloors) return;
       this.arrayWayElevator.push(number);
       console.log(this.arrayWayElevator);
-    }
+    },
   },
 }
 </script>
@@ -75,4 +75,5 @@ nav a.router-link-exact-active {
   top: 200px;
   left: 200px;
 }
+
 </style>
