@@ -1,6 +1,8 @@
 <template>
   <div class="floor">
-    <button v-on:click="$emit('changeFloorNumber', floorNumber)">
+    <button
+      v-on:click="$emit('changeFloorNumber', floorNumber, buttonActiveId)"
+      v-bind:class='{active: buttonActive}'>
         {{floorNumber}}
     </button>
   </div>
@@ -9,11 +11,7 @@
 <script>
 
 export default {
-    props:['floorNumber'],
-    data(){
-        return {
-        }
-    },
+    props:['floorNumber', "buttonActive", "buttonActiveId"],
     components: {},
     methods: {},
 }
@@ -21,8 +19,12 @@ export default {
 
 <style>
 .floor{
-    width: 700px;
-    height: 50px;
-    outline: 1px solid #000;
+  width: 700px;
+  height: 50px;
+  outline: 1px solid #000;
+}
+
+.active{
+  background-color: blue;
 }
 </style>
