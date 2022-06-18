@@ -39,6 +39,7 @@ export default {
       buttonId++;
     }
     return {
+      alredyInProgres: true,
       elevatorTimeOut: 1000,
       elevatorPosition: 1,
       floors,
@@ -52,8 +53,6 @@ export default {
   },
   components: { Floor, Elevator },
   methods: {
-
-
     passedFloors(oneNumber, twoNumber){
       if(oneNumber < twoNumber){
         while(oneNumber <= twoNumber){
@@ -75,9 +74,7 @@ export default {
       }
       this.arrayWayElevatorInAllFloor.splice(0, 1);
       this.elevatorPosition = this.arrayWayElevatorInAllFloor[0];
-      console.log(this.floors)
-      // this.floors[this.purposeOfTheMovement].active = false;
-      setTimeout(this.moveElevator, this.elevatorTimeOut);
+      console.log(this.arrayWayElevatorInAllFloor)
     },
 
     addFloorNumber(number, buttonId){
@@ -98,7 +95,10 @@ export default {
         this.arrayWayElevatorInAllFloor.push(item);
       });
       this.purposeOfTheMovement = this.arrayWayElevatorInAllFloor[this.arrayWayElevatorInAllFloor.length - 1];
-      setTimeout(this.moveElevator, this.elevatorTimeOut);
+      if(this.alredyInProgres){
+        setInterval(this.moveElevator, this.elevatorTimeOut);
+        this.alredyInProgres = false;
+      };
       this.arrayWayElevator.splice(0, 1);
     },
   },
@@ -129,6 +129,7 @@ nav a.router-link-exact-active {
 
 .mainBoard {
   position: absolute;
+  float: left;
   top: 200px;
   left: 200px;
 }
