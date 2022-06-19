@@ -3,10 +3,11 @@
     <div class="mainBoard">
       <Elevator 
         v-bind:numberFloor="elevatorPosition"
+        v-bind:purposeOfTheMovement="purposeOfTheMovement"
         v-bind:moveDirectionElevator="moveDirectionElevator"
       />
       <Floor 
-        v-for="item in floor"
+        v-for="item in floors"
         v-bind:floorNumber="item.number"
         v-bind:buttonActive="item.active"
         v-bind:buttonActiveId="item.id"
@@ -19,26 +20,39 @@
 <script>
 import Floor from "@/components/Floor"
 import Elevator from "@/components/Elevator"
+
+
+
 export default {
   name: 'App',
   data(){
+    let floorCount = 5;
+    let buttonId = 0;
+    let floors = [];
+    while(floorCount > 0){
+      floors.push({
+        number: floorCount,
+        id: buttonId,
+        active: false,
+      });
+      floorCount--;
+      buttonId++;
+    }
     return {
+      elevatorTimeOut: 1000,
       elevatorPosition: 1,
-      floor: [
-        {number: 5, id: 0, active: false},
-        {number: 4, id: 1, active: false},
-        {number: 3, id: 2, active: false},
-        {number: 2, id: 3, active: false},
-        {number: 1, id: 4, active: false},
-      ],
-      arrayWayElevator: [],
+      floors,
+      arrayWayElevator: [1],
+      arrayWayElevatorInAllFloor: [],
       localArrayWayElevator: [],
       matchingFloors: false,
       moveDirectionElevator: "",
+      purposeOfTheMovement: "",
     }
   },
   components: { Floor, Elevator },
   methods: {
+
 
     passedFloors(oneNumber, twoNumber){
       if(oneNumber < twoNumber){
@@ -55,8 +69,18 @@ export default {
       return this.localArrayWayElevator;
     },
 
+    moveElevator(){
+      if(this.arrayWayElevatorInAllFloor.length == 1){
+        return;
+      }
+      this.arrayWayElevatorInAllFloor.splice(0, 1);
+      this.elevatorPosition = this.arrayWayElevatorInAllFloor[0];
+      console.log(this.floors)
+      // this.floors[this.purposeOfTheMovement].active = false;
+      setTimeout(this.moveElevator, this.elevatorTimeOut);
+    },
 
-    addFloorNumber(number, index){
+    addFloorNumber(number, buttonId){
       this.localArrayWayElevator = [];
       this.matchingFloors = false;
       if(number == this.elevatorPosition) return;
@@ -69,15 +93,12 @@ export default {
       if(this.elevatorPosition < number) this.moveDirectionElevator = "↑";
       if(this.elevatorPosition > number) this.moveDirectionElevator = "↓";
       this.arrayWayElevator.push(number);
-      this.floor[index].active = true;
-      console.log(this.passedFloors(this.elevatorPosition, number));
-      // this.elevatorPosition = number;
-      this.passedFloors(this.elevatorPosition, this.arrayWayElevator[0]).forEach((localNumberFloor) => {
-        setTimeout(() => {
-          this.elevatorPosition = localNumberFloor;
-          console.log(this.elevatorPosition);
-        }, 1000);
+      this.floors[buttonId].active = true;
+      this.passedFloors(this.arrayWayElevator[0], this.arrayWayElevator[1]).forEach((item) => {
+        this.arrayWayElevatorInAllFloor.push(item);
       });
+      this.purposeOfTheMovement = this.arrayWayElevatorInAllFloor[this.arrayWayElevatorInAllFloor.length - 1];
+      setTimeout(this.moveElevator, this.elevatorTimeOut);
       this.arrayWayElevator.splice(0, 1);
     },
   },
