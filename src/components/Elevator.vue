@@ -2,7 +2,8 @@
   <div class="mineElevator">
     <div 
         class="elevator"
-        v-bind:style="{bottom: (numberFloor - 1) * 50 + 'px'}">
+        v-bind:style="{bottom: (numberFloor - 1) * 50 + 'px'}"
+        v-bind:class="{wait: elevatorIsWait}">
         {{purposeOfTheMovement}}
         {{moveDirectionElevator}}
     </div>
@@ -12,7 +13,7 @@
 <script>
 
 export default {
-    props:['numberFloor', 'purposeOfTheMovement', 'moveDirectionElevator'],
+    props:['numberFloor', 'purposeOfTheMovement', 'moveDirectionElevator', 'elevatorIsWait'],
     data(){
         return {
 
@@ -37,6 +38,16 @@ export default {
     height: 50px;
     background-color: red;
     transition-duration: 1s;
+}
+
+.wait {
+  animation:1s blinker linear infinite;
+}
+
+@keyframes blinker {
+0% { opacity: 1.0; }
+50% { opacity: 0.0; }
+100% { opacity: 1.0; }
 }
 
 

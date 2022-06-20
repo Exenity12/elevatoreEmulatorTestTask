@@ -5,6 +5,7 @@
         v-bind:numberFloor="elevatorPosition"
         v-bind:purposeOfTheMovement="purposeOfTheMovement"
         v-bind:moveDirectionElevator="moveDirectionElevator"
+        v-bind:elevatorIsWait="elevatorIsWait"
       />
       <Floor 
         v-for="item in floors"
@@ -42,6 +43,7 @@ export default {
       alredyInProgres: true,
       elevatorTimeOut: 1000,
       elevatorPosition: 1,
+      elevatorIsWait: false,
       floors,
       arrayWayElevator: [1],
       arrayWayElevatorInAllFloor: [],
@@ -75,10 +77,14 @@ export default {
     moveElevator(){
       if(this.inactiveButton){
         let arr = this.floors.find(item => item.number == this.arrayWayElevatorInAllFloor[0]);
-        arr.active = false;
-        this.inactiveButton = false;
+        if(this.arrayWayElevatorInAllFloor[0] == this.arrayWayElevatorInAllFloor[1]){
+          arr.active = false;
+          this.inactiveButton = false;
+          this.elevatorIsWait = true;
+        };
       }
       if(this.arrayWayElevatorInAllFloor.length == 1){
+        this.elevatorIsWait = false;
         this.purposeOfTheMovement = "";
         this.moveDirectionElevator = "";
         return;
@@ -91,25 +97,26 @@ export default {
           this.purposeOfTheMovement = this.arrayWayElevatorInAllFloor[loopIteration];
           if(this.elevatorPosition < this.arrayWayElevatorInAllFloor[loopIteration]) {
             this.moveDirectionElevator = "↑";
+            this.elevatorIsWait = false;
           } else if(this.elevatorPosition > this.arrayWayElevatorInAllFloor[loopIteration]){
             this.moveDirectionElevator = "↓";
+            this.elevatorIsWait = false;
           };
           break;
         };
         loopIteration++;
       }
-      this.elevatorPosition = this.arrayWayElevatorInAllFloor[0];
-      let iteratingTheArray = 0;
       if(this.arrayWayElevatorInAllFloor[0] == this.arrayWayElevatorInAllFloor[1]){
         this.inactiveButton = true;
       };
+      this.elevatorPosition = this.arrayWayElevatorInAllFloor[0];
+      let iteratingTheArray = 0;
     },
      
     addFloorNumber(number, buttonId){
       console.log(number)
       this.localArrayWayElevator = [];
       this.matchingFloors = false;
-      if(number == this.elevatorPosition) return;
       if(this.arrayWayElevator){
         this.arrayWayElevator.forEach((item) => {
           if(item == number) this.matchingFloors = true;
@@ -129,6 +136,15 @@ export default {
     },
   },
 }
+
+
+
+// сохранение состояния
+// разное кол-во elevators
+// 
+
+
+
 </script>
 
 <style>
