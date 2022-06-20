@@ -49,6 +49,8 @@ export default {
       matchingFloors: false,
       moveDirectionElevator: "",
       purposeOfTheMovement: "",
+      inactiveButton: false,
+
     }
   },
   components: { Floor, Elevator },
@@ -59,25 +61,52 @@ export default {
           this.localArrayWayElevator.push(oneNumber);
           oneNumber++;
         };
+        this.localArrayWayElevator.push(oneNumber - 1);
       } else if(oneNumber > twoNumber){
         while(oneNumber >= twoNumber){
           this.localArrayWayElevator.push(oneNumber);
           oneNumber--;
         };
+        this.localArrayWayElevator.push(oneNumber + 1);
       };
       return this.localArrayWayElevator;
     },
 
     moveElevator(){
+      if(this.inactiveButton){
+        let arr = this.floors.find(item => item.number == this.arrayWayElevatorInAllFloor[0]);
+        arr.active = false;
+        this.inactiveButton = false;
+      }
       if(this.arrayWayElevatorInAllFloor.length == 1){
+        this.purposeOfTheMovement = "";
+        this.moveDirectionElevator = "";
         return;
       }
       this.arrayWayElevatorInAllFloor.splice(0, 1);
-      this.elevatorPosition = this.arrayWayElevatorInAllFloor[0];
       console.log(this.arrayWayElevatorInAllFloor)
+      let loopIteration = 0;
+      while(loopIteration < this.arrayWayElevatorInAllFloor.length){
+        if(this.arrayWayElevatorInAllFloor[loopIteration] == this.arrayWayElevatorInAllFloor[loopIteration + 1]){
+          this.purposeOfTheMovement = this.arrayWayElevatorInAllFloor[loopIteration];
+          if(this.elevatorPosition < this.arrayWayElevatorInAllFloor[loopIteration]) {
+            this.moveDirectionElevator = "↑";
+          } else if(this.elevatorPosition > this.arrayWayElevatorInAllFloor[loopIteration]){
+            this.moveDirectionElevator = "↓";
+          };
+          break;
+        };
+        loopIteration++;
+      }
+      this.elevatorPosition = this.arrayWayElevatorInAllFloor[0];
+      let iteratingTheArray = 0;
+      if(this.arrayWayElevatorInAllFloor[0] == this.arrayWayElevatorInAllFloor[1]){
+        this.inactiveButton = true;
+      };
     },
-
+     
     addFloorNumber(number, buttonId){
+      console.log(number)
       this.localArrayWayElevator = [];
       this.matchingFloors = false;
       if(number == this.elevatorPosition) return;
@@ -87,14 +116,11 @@ export default {
         });
       };
       if(this.matchingFloors) return;
-      if(this.elevatorPosition < number) this.moveDirectionElevator = "↑";
-      if(this.elevatorPosition > number) this.moveDirectionElevator = "↓";
       this.arrayWayElevator.push(number);
       this.floors[buttonId].active = true;
       this.passedFloors(this.arrayWayElevator[0], this.arrayWayElevator[1]).forEach((item) => {
         this.arrayWayElevatorInAllFloor.push(item);
       });
-      this.purposeOfTheMovement = this.arrayWayElevatorInAllFloor[this.arrayWayElevatorInAllFloor.length - 1];
       if(this.alredyInProgres){
         setInterval(this.moveElevator, this.elevatorTimeOut);
         this.alredyInProgres = false;
@@ -106,28 +132,9 @@ export default {
 </script>
 
 <style>
-#app {
-  font-family: Avenir, Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  text-align: center;
-  color: #2c3e50;
-}
-
-nav {
-  padding: 30px;
-}
-
-nav a {
-  font-weight: bold;
-  color: #2c3e50;
-}
-
-nav a.router-link-exact-active {
-  color: #42b983;
-}
 
 .mainBoard {
+  text-align: center;
   position: absolute;
   float: left;
   top: 200px;
