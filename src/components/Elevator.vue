@@ -26,18 +26,19 @@ export default {
 
 <style>
 .mineElevator{
-    position: absolute;
-    width: 50px;
-    height: 100%;
-    background-color: black;
+  position: relative;
+  width: 50px;
+  outline: 1px solid #000;
 }
 
 .elevator{
-    position: absolute;
-    width: 50px;
-    height: 50px;
-    background-color: red;
-    transition-duration: 1s;
+  position: absolute;
+  margin: 1px;
+  width: 48px;
+  height: 48px;
+  background-color: red;
+  outline: 1px solid #000;
+  transition-duration: 1s;
 }
 
 .wait {

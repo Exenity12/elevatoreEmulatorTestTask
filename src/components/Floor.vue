@@ -20,7 +20,7 @@ export default {
 <style>
 .floor{
   position: relative;
-  width: 700px;
+  width: 300px;
   height: 50px;
   outline: 1px solid #000;
 }
