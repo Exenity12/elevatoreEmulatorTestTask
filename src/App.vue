@@ -30,8 +30,8 @@ import Elevator from "@/components/Elevator"
 export default {
   name: 'App',
   data(){
-    let floorCount = 5; // Количество этажей
-    let elevatorCount = 3; // Количество лифтов
+    let floorCount = 8; // Количество этажей
+    let elevatorCount = 4; // Количество лифтов
     let arrayElevator = [];
     let buttonId = 0;
     let elevatorId = 0;
@@ -51,24 +51,26 @@ export default {
         elevatorPosition: 1,
         moveDirectionElevator: "",
         purposeOfTheMovement: "",
+        elevatorMovementTimer: "",
         elevatorIsWait: false,
+        alredyInProgres: true,
+        arrayWayElevator: [1],
         arrayWayElevatorInAllFloor: [],
-        elevatorMovementTimer: ""
       });
       elevatorId++;
       elevatorCount--;
     };
     return {
-      arrayElevator,
-      alredyInProgres: true,
-      elevatorTimeOut: 1000,
       floors,
+      arrayElevator,
+      indexNearestElevator: 0,
+      activeElevator: 0,
+      elevatorTimeOut: 1000,
       arrayWayElevator: [1],
-      arrayWayElevatorInAllFloor: [],
       localArrayWayElevator: [],
       matchingFloors: false,
       inactiveButton: false,
-
+      alredyInProgres: true,
     }
   },
   components: { Floor, Elevator },
@@ -90,68 +92,146 @@ export default {
       return this.localArrayWayElevator;
     },
 
-    moveElevator(){
-      console.log(this.arrayElevator)
-      if(this.inactiveButton){
-        let arr = this.floors.find(item => item.number == this.arrayElevator[0].arrayWayElevatorInAllFloor[0]);
-        if(this.arrayElevator[0].arrayWayElevatorInAllFloor[0] == this.arrayElevator[0].arrayWayElevatorInAllFloor[1]){
-          arr.active = false;
-          this.inactiveButton = false;
-          this.arrayElevator[0].elevatorIsWait = true;
-        };
-      }
-      if(this.arrayElevator[0].arrayWayElevatorInAllFloor.length == 1){
-        this.arrayElevator[0].elevatorIsWait = false;
-        this.arrayElevator[0].purposeOfTheMovement = "";
-        this.arrayElevator[0].moveDirectionElevator = "";
-        return;
-      }
-      this.arrayElevator[0].arrayWayElevatorInAllFloor.splice(0, 1);
-      let loopIteration = 0;
-      while(loopIteration < this.arrayElevator[0].arrayWayElevatorInAllFloor.length){
-        if(this.arrayElevator[0].arrayWayElevatorInAllFloor[loopIteration] == this.arrayElevator[0].arrayWayElevatorInAllFloor[loopIteration + 1]){
-          this.arrayElevator[0].purposeOfTheMovement = this.arrayElevator[0].arrayWayElevatorInAllFloor[loopIteration];
-          if(this.arrayElevator[0].elevatorPosition < this.arrayElevator[0].arrayWayElevatorInAllFloor[loopIteration]) {
-            this.arrayElevator[0].moveDirectionElevator = "↑";
-            this.arrayElevator[0].elevatorIsWait = false;
-          } else if(this.arrayElevator[0].elevatorPosition > this.arrayElevator[0].arrayWayElevatorInAllFloor[loopIteration]){
-            this.arrayElevator[0].moveDirectionElevator = "↓";
-            this.arrayElevator[0].elevatorIsWait = false;
-          };
-          break;
-        };
-        loopIteration++;
-      }
-      if(this.arrayElevator[0].arrayWayElevatorInAllFloor[0] == this.arrayElevator[0].arrayWayElevatorInAllFloor[1]){
-        this.inactiveButton = true;
-      };
-      this.arrayElevator[0].elevatorPosition = this.arrayElevator[0].arrayWayElevatorInAllFloor[0];
-      let iteratingTheArray = 0;
-    },
-     
+    // moveElevator(index){
+    //   this.arrayElevator[index].arrayWayElevatorInAllFloor.splice(0, 1);
+    //   this.arrayElevator[index].elevatorPosition = this.arrayElevator[index].arrayWayElevatorInAllFloor[0];
+    //   console.log(index);
+    // },
+
     addFloorNumber(number, buttonId){
-      if(this.floors[buttonId].active == true) return
       this.localArrayWayElevator = [];
+      let arrayFloorWhenIsElevator = [];
+      let arrayClonFloorsWhenIsElevator = ""
+      let indexOfTheNearestNumbers = 0;
+      this.indexNearestElevator = 0;
       this.matchingFloors = false;
-      if(this.arrayWayElevator){
-        this.arrayWayElevator.forEach((item) => {
-          if(item == number) this.matchingFloors = true;
+      this.arrayElevator.forEach((elevator) => {
+        elevator.arrayWayElevator.forEach((way) => {
+          if(way == number) {
+            this.matchingFloors = true;
+            return;
+          };
         });
-      };
-      if(this.matchingFloors) return;
-      this.arrayWayElevator.push(number);
-      this.floors[buttonId].active = true;
-      this.passedFloors(this.arrayWayElevator[0], this.arrayWayElevator[1]).forEach((item) => {
-        this.arrayElevator[0].arrayWayElevatorInAllFloor.push(item);
+        arrayFloorWhenIsElevator.push(elevator.elevatorPosition);
       });
-      if(this.alredyInProgres){
-        setInterval(this.moveElevator, this.elevatorTimeOut);
-        this.alredyInProgres = false;
+      if(this.matchingFloors) return;
+      this.floors[buttonId].active = true;
+      arrayClonFloorsWhenIsElevator = [...arrayFloorWhenIsElevator];
+      this.indexNearestElevator = arrayFloorWhenIsElevator.indexOf(arrayClonFloorsWhenIsElevator.sort((x, y) => Math.abs(number - x) - Math.abs(number - y))[indexOfTheNearestNumbers]);
+      if(this.arrayElevator[this.indexNearestElevator].arrayWayElevator.length > 1){
+        indexOfTheNearestNumbers++;
+        this.indexNearestElevator = arrayFloorWhenIsElevator.indexOf(arrayClonFloorsWhenIsElevator.sort((x, y) => Math.abs(number - x) - Math.abs(number - y))[indexOfTheNearestNumbers]);
       };
-      this.arrayWayElevator.splice(0, 1);
-    },
+      this.arrayElevator[this.indexNearestElevator].arrayWayElevator.push(number);
+      this.passedFloors(this.arrayElevator[0].arrayWayElevator[0], number).forEach((item) => {
+        this.arrayElevator[this.indexNearestElevator].arrayWayElevatorInAllFloor.push(item);
+      });
+      console.log(this.arrayElevator[this.indexNearestElevator].arrayWayElevatorInAllFloor);
+      // if(this.arrayElevator[this.indexNearestElevator].alredyInProgres){
+      //   this.arrayElevator[this.indexNearestElevator].elevatorMovementTimer = setInterval(this.moveElevator, this.elevatorTimeOut, this.indexNearestElevator);
+      //   this.arrayElevator[this.indexNearestElevator].alredyInProgres = false;
+      // };
+      this.arrayElevator[this.indexNearestElevator].arrayWayElevator.splice(0, 1);
+      this.arrayElevator[this.indexNearestElevator].elevatorPosition = this.arrayElevator[this.indexNearestElevator].arrayWayElevator[0];
+    },  
   },
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+//  moveElevator(){
+//       if(this.inactiveButton){
+//         let arr = this.floors.find(item => item.number == this.arrayElevator[this.activeElevator].arrayWayElevatorInAllFloor[0]);
+//         if(this.arrayElevator[this.activeElevator].arrayWayElevatorInAllFloor[0] == this.arrayElevator[this.activeElevator].arrayWayElevatorInAllFloor[1]){
+//           arr.active = false;
+//           this.inactiveButton = false;
+//           this.arrayElevator[this.activeElevator].elevatorIsWait = true;
+//         };
+//       }
+
+
+
+//       if(this.arrayElevator[this.activeElevator].arrayWayElevatorInAllFloor.length == 1){
+//         clearTimeout(this.arrayElevator[1].elevatorMovementTimer);
+//         this.arrayElevator[this.activeElevator].elevatorIsWait = false;
+//         this.arrayElevator[this.activeElevator].purposeOfTheMovement = "";
+//         this.arrayElevator[this.activeElevator].moveDirectionElevator = "";
+//         this.alredyInProgres = true;
+//         return;
+//       }
+
+
+
+
+
+//       this.arrayElevator[this.activeElevator].arrayWayElevatorInAllFloor.splice(0, 1);
+
+
+//       let loopIteration = 0;
+//       while(loopIteration < this.arrayElevator[this.activeElevator].arrayWayElevatorInAllFloor.length){
+//         if(this.arrayElevator[this.activeElevator].arrayWayElevatorInAllFloor[loopIteration] == this.arrayElevator[this.activeElevator].arrayWayElevatorInAllFloor[loopIteration + 1]){
+//           this.arrayElevator[this.activeElevator].purposeOfTheMovement = this.arrayElevator[this.activeElevator].arrayWayElevatorInAllFloor[loopIteration];
+//           if(this.arrayElevator[this.activeElevator].elevatorPosition < this.arrayElevator[this.activeElevator].arrayWayElevatorInAllFloor[loopIteration]) {
+//             this.arrayElevator[this.activeElevator].moveDirectionElevator = "↑";
+//             this.arrayElevator[this.activeElevator].elevatorIsWait = false;
+//           } else if(this.arrayElevator[this.activeElevator].elevatorPosition > this.arrayElevator[this.activeElevator].arrayWayElevatorInAllFloor[loopIteration]){
+//             this.arrayElevator[this.activeElevator].moveDirectionElevator = "↓";
+//             this.arrayElevator[this.activeElevator].elevatorIsWait = false;
+//           };
+//           break;
+//         };
+//         loopIteration++;
+//       }
+
+
+
+
+
+//       if(this.arrayElevator[this.activeElevator].arrayWayElevatorInAllFloor[0] == this.arrayElevator[this.activeElevator].arrayWayElevatorInAllFloor[1]){
+//         this.inactiveButton = true;
+//       };
+
+
+
+
+//       this.arrayElevator[this.activeElevator].elevatorPosition = this.arrayElevator[this.activeElevator].arrayWayElevatorInAllFloor[0];
+//       let iteratingTheArray = 0;
+//     },
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 </script>
 
