@@ -28,8 +28,8 @@ import Elevator from "@/components/Elevator"
 export default {
   name: 'App',
   data(){
-    let floorCount = 8; // Количество этажей
-    let elevatorCount = 4; // Количество лифтов
+    let floorCount = 5; // Количество этажей
+    let elevatorCount = 1; // Количество лифтов
     let arrayElevator = [];
     let buttonId = 0;
     let elevatorId = 0;
@@ -64,7 +64,6 @@ export default {
       indexNearestElevator: 0,
       activeElevator: 0,
       elevatorTimeOut: 1000,
-      arrayWayElevator: [1],
       localArrayWayElevator: [],
       matchingFloors: false,
       inactiveButton: false,
@@ -91,8 +90,11 @@ export default {
     },
 
     moveElevator(index){
-      localStorage.setItem('arrayElevator', this.arrayElevator);
-      console.log(...this.arrayElevator)
+      let localArrayElevatorposition = [];
+      this.arrayElevator.forEach((eleavtor) => {
+        localArrayElevatorposition.push(eleavtor.elevatorPosition);
+      });
+      localStorage.setItem('arrayElevator', localArrayElevatorposition);
       const nearest = this.arrayElevator[index];
       if(nearest.arrayWayElevatorInAllFloor[0] == nearest.arrayWayElevatorInAllFloor[1]){
         let arr = this.floors.find(item => item.number == nearest.arrayWayElevatorInAllFloor[0]);
@@ -152,12 +154,13 @@ export default {
       let nearestNumber = arrayClonFloorsWhenIsElevator.sort((x, y) => Math.abs(number - x) - Math.abs(number - y))[indexOfTheNearestNumbers];
       while(indexInArrayElevators < this.arrayElevator.length){
         this.indexNearestElevator = arrayFloorWhenIsElevator.indexOf(nearestNumber);
-        console.log(nearestNumber)
+        if(this.arrayElevator.length == 1) break;
         if(this.arrayElevator[this.indexNearestElevator].arrayWayElevatorInAllFloor.length > 1){
           indexOfTheNearestNumbers ++;
           this.indexNearestElevator++;
           nearestNumber = arrayClonFloorsWhenIsElevator.sort((x, y) => Math.abs(number - x) - Math.abs(number - y))[indexOfTheNearestNumbers];
         }
+        if(this.indexNearestElevator == this.arrayElevator.length) this.indexNearestElevator = 0;
         indexInArrayElevators++;
       };
       const elevator = this.arrayElevator[this.indexNearestElevator];
@@ -173,8 +176,31 @@ export default {
     }, 
   },
   beforeMount(){
-    console.log("render");
-    //if(localStorage.arrayElevator) //this.arrayElevator = localStorage.arrayElevator;
+    let iteration = 0;
+    let iterationLocalStor = 0;
+    if(localStorage.arrayElevator){
+      while(iteration < this.arrayElevator.length){
+        if(isNaN(+localStorage.arrayElevator.split(',')[iteration])){
+          this.arrayElevator[iteration].elevatorPosition = [1];
+          this.arrayElevator[iteration].arrayWayElevator = [1];
+        };
+        if(!isNaN(+localStorage.arrayElevator.split(',')[iteration])){
+          this.arrayElevator[iteration].elevatorPosition = [Number(localStorage.arrayElevator[iterationLocalStor])];
+          this.arrayElevator[iteration].arrayWayElevator = [Number(localStorage.arrayElevator[iterationLocalStor])];
+        };
+        if(this.arrayElevator[iteration].elevatorPosition > this.floors.length) {
+          this.arrayElevator[iteration].elevatorPosition = [1];
+          this.arrayElevator[iteration].arrayWayElevator = [1];
+        };
+        iteration++;
+        iterationLocalStor += 2;
+      };
+    };
+    let localArrayElevatorposition = [];
+    this.arrayElevator.forEach((eleavtor) => {
+      localArrayElevatorposition.push(eleavtor.elevatorPosition);
+    });
+    localStorage.setItem('arrayElevator', localArrayElevatorposition);
   }, 
 }
 </script>
