@@ -93,6 +93,8 @@ export default {
     },
 
     moveElevator(index){
+
+
       if(this.arrayElevator[index].arrayWayElevatorInAllFloor[0] == this.arrayElevator[index].arrayWayElevatorInAllFloor[1]){
         let arr = this.floors.find(item => item.number == this.arrayElevator[index].arrayWayElevatorInAllFloor[0]);
         if(this.arrayElevator[index].arrayWayElevatorInAllFloor[0] == this.arrayElevator[index].arrayWayElevatorInAllFloor[1]){
@@ -101,16 +103,13 @@ export default {
           this.arrayElevator[index].elevatorIsWait = true;
         };
       };
-
       if(this.arrayElevator[index].arrayWayElevatorInAllFloor.length == 1){
-        clearTimeout(this.arrayElevator[index].elevatorMovementTimer);
         this.arrayElevator[index].elevatorIsWait = false;
         this.arrayElevator[index].purposeOfTheMovement = "";
         this.arrayElevator[index].moveDirectionElevator = "";
-        this.alredyInProgres = true;
         return;
       };
-
+      this.arrayElevator[index].arrayWayElevatorInAllFloor.splice(0, 1);
       let loopIteration = 0;
       while(loopIteration < this.arrayElevator[index].arrayWayElevatorInAllFloor.length){
         if(this.arrayElevator[index].arrayWayElevatorInAllFloor[loopIteration] == this.arrayElevator[index].arrayWayElevatorInAllFloor[loopIteration + 1]){
@@ -127,7 +126,8 @@ export default {
         loopIteration++;
       };
 
-      this.arrayElevator[index].arrayWayElevatorInAllFloor.splice(0, 1);
+
+
       this.arrayElevator[index].elevatorPosition = this.arrayElevator[index].arrayWayElevatorInAllFloor[0];
     },
 
@@ -157,14 +157,12 @@ export default {
 
 
       
-
       indexOfTheNearestNumbers = 0;
       let nearestNumber = arrayClonFloorsWhenIsElevator.sort((x, y) => Math.abs(number - x) - Math.abs(number - y))[indexOfTheNearestNumbers];
       console.log(arrayClonFloorsWhenIsElevator)
       while(indexInArrayElevators < this.arrayElevator.length){
         this.indexNearestElevator = arrayFloorWhenIsElevator.indexOf(nearestNumber);
-        if(this.arrayElevator[this.indexNearestElevator].arrayWayElevatorInAllFloor.length > 0){
-          console.log("124ed1ws")
+        if(this.arrayElevator[this.indexNearestElevator].arrayWayElevatorInAllFloor.length > 1){
           indexOfTheNearestNumbers++;
           nearestNumber = arrayClonFloorsWhenIsElevator.sort((x, y) => Math.abs(number - x) - Math.abs(number - y))[indexOfTheNearestNumbers];
         }
@@ -183,6 +181,7 @@ export default {
 
       this.arrayElevator[this.indexNearestElevator].arrayWayElevator.push(number);
       this.passedFloors(this.arrayElevator[this.indexNearestElevator].arrayWayElevator[0], number).forEach((item) => {
+        console.log(item)
         this.arrayElevator[this.indexNearestElevator].arrayWayElevatorInAllFloor.push(item);
       });
       console.log(this.arrayElevator[this.indexNearestElevator].arrayWayElevatorInAllFloor);
