@@ -68,7 +68,7 @@ export default {
       matchingFloors: false,
       inactiveButton: false,
       alredyInProgres: true,
-    }
+    };
   },
   components: { Floor, Elevator },
   methods: {
